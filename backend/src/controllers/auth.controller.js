@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import { User } from "../models/user.model.js";
+import { createTransporter } from "../config/nodemailer.js";
 
 export const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
@@ -96,6 +97,21 @@ export const loginUser = async (req, res) => {
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
+
+        console.log("Logged In Successfully.")
+
+        try {
+            const transporter = createTransporter();
+            const mailOptions = {
+                from: process.env.SENDER_EMAIL,
+                to: email,
+                subject: "Welcome to One Piece",
+                text: "Welcome to One Piece World. Let's Continue Our Adventure!",
+            };
+            await transporter.sendMail(mailOptions);
+        } catch (error) {
+            console.error("Email send error:", error);
+        }
 
         return res.status(200).json({
             success: true,
