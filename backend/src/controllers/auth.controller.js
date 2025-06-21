@@ -16,7 +16,7 @@ export const registerUser = async (req, res) => {
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(200).json({
+            return res.status(400).json({
                 success: false,
                 message: "User Already Exists."
             });
@@ -37,18 +37,17 @@ export const registerUser = async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        return res
-            .cookie("token", token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            })
-            .status(200)
-            .json({
-                success: true,
-                message: "User Registered Successfully."
-            });
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "User Registered Successfully."
+        });
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -98,7 +97,7 @@ export const loginUser = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        return res.status(200).json({ 
+        return res.status(200).json({
             success: true,
             message: "Logged In Successfully."
         })
@@ -126,7 +125,7 @@ export const logoutUser = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Error in logoutUser controller\n",
+            message: "Error in logoutUser controller",
             error: error.message
         });
     }
