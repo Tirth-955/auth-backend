@@ -165,6 +165,7 @@ export const sendVerifyOtp = async (req, res) => {
 
         user.verifyOtp = otp;
 
+        // 1 hour
         user.verifyOtpExpiredAt = Date.now() + 1 * 60 * 60 * 1000;
 
         await user.save();
@@ -257,6 +258,112 @@ export const isAuthenticated = async (req, res) => {
             success: false,
             message: "Error in isAuthenticated controller",
             error: error.message
+        });
+    }
+}
+
+// Send Password reset OTP
+export const sendResetOtp = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.json({
+            success: false,
+            message: "Email is Required!"
+        });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User Not Found!"
+            });
+        }
+
+        const otp = String(Math.floor(1_00_000 + Math.random() * 9_00_000));
+
+        user.resetOtp = otp;
+
+        // 15 minutes
+        user.resetOtpExpiredAt = Date.now() + 15 * 60 * 1000;
+
+        await user.save();
+
+        const transporter = createTransporter();
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: "Password Reset OTP",
+            text: `Your OTP for Resetting the Password is ${otp}.`,
+        }
+        await transporter.sendMail(mailOptions);
+
+        return res.json({
+            success: true,
+            message: "OTP sent to your Email"
+        });
+    } catch (error) {
+        return res.json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+// Reset User Password
+export const resetPassword = async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+        return res.json({
+            success: false,
+            message: "Email, OTP & New Password are Required!"
+        });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User Not Found!"
+            });
+        }
+
+        if (user.resetOtp === "" || user.resetOtp !== otp) {
+            return res.json({
+                success: false,
+                message: "Invalid OTP!"
+            });
+        }
+
+        if (user.resetOtpExpiredAt < Date.now()) {
+            return res.json({
+                success: false,
+                message: "OTP Expired"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        user.password = hashedPassword;
+        user.resetOtp = "";
+        user.resetOtpExpiredAt = 0;
+
+        await user.save();
+
+        return res.json({
+            success: true,
+            message: "Password Has Been Reset Successfully."
+        });
+    } catch (error) {
+        return res.json({
+            success: false,
+            message: error.message
         });
     }
 }
