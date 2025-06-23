@@ -151,7 +151,7 @@ export const logoutUser = async (req, res) => {
 // Send Verification OTP to User's Email
 export const sendVerifyOtp = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const { userId } = req;
         const user = await User.findById(userId);
 
         if (user.isAccountVerified) {
@@ -191,8 +191,10 @@ export const sendVerifyOtp = async (req, res) => {
     }
 }
 
+// Verify EMAIL using OTP
 export const verifyEmail = async (req, res) => {
-    const { userId, otp } = req.body;
+    const { otp } = req.body;
+    const { userId } = req;
 
     if (!userId || !otp) {
         return res.json({
@@ -237,10 +239,24 @@ export const verifyEmail = async (req, res) => {
             message: "Email Verified Successfully."
         });
     } catch (error) {
-        res.json({
+        return res.json({
             success: false,
             message: "Error in verifyEmail controller",
             error: error.message
-        })
+        });
     }
-}       
+}
+
+export const isAuthenticated = async (req, res) => {
+    try {
+        return res.json({
+            success: true,
+        });
+    } catch (error) {
+        return res.json({
+            success: false,
+            message: "Error in isAuthenticated controller",
+            error: error.message
+        });
+    }
+}
