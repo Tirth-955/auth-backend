@@ -38,16 +38,20 @@ This is the backend for the MERN-AUTH project, providing user authentication fun
     In the `backend` directory, create a `.env` file and add the following environment variables:
 
     ```env
-    PORT=4000
-    MONGO_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret_key
-    SENDER_EMAIL=your_email@example.com
-    SENDER_PASSWORD=your_email_password # App password for Gmail or similar
-    NODE_ENV=development # or production
+    PORT="4000"
+
+    MONGODB_URI=""
+
+    JWT_SECRET=""
+    NODE_ENV="development"
+
+    SMTP_USER="your-smtp-username"
+    SMTP_PASSWORD="your-smtp-password"
+    SENDER_EMAIL="no-reply@yourdomain.com"
     ```
     *   Replace `your_mongodb_connection_string` with your MongoDB connection URI.
     *   Replace `your_jwt_secret_key` with a strong, random string.
-    *   Set `SENDER_EMAIL` and `SENDER_PASSWORD` for Nodemailer (e.g., if using Gmail, you'll need an App Password).
+    *   Set `SENDER_EMAIL` and `SENDER_PASSWORD` for Nodemailer.
 
 4.  **Run the backend server:**
     ```bash
