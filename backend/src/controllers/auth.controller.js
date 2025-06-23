@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 
 import { User } from "../models/user.model.js";
 import { createTransporter } from "../config/nodemailer.js";
-import { use } from "react";
 
 export const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
