@@ -25,7 +25,7 @@ This is the backend for the MERN-AUTH project, providing user authentication fun
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/Tirth-955/auth-backend.git
     cd mern-auth/backend
     ```
 
